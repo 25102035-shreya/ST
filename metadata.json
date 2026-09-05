@@ -1,0 +1,6 @@
+{
+  "name": "SkillTrack",
+  "description": "Smart Student Success & Placement Analyzer featuring readiness scoring, career skill-gap analysis, What-If simulator, Java CLI terminal, and academic audit reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
