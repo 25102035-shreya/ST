@@ -164,26 +164,178 @@ export const StudentDataInputCard: React.FC<StudentDataInputCardProps> = ({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  University Degree CGPA (0.0 - 10.0 scale)
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="10"
-                    value={factualData.cgpa}
-                    onChange={(e) => handleFieldChange('cgpa', parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-blue-500 font-mono"
-                  />
-                </div>
-                <p className="text-[10px] text-slate-400 mt-1">
-                  Verified degree transcript CGPA (70% weight)
-                </p>
-              </div>
+              <div className="sm:col-span-2 space-y-3">
 
+  {/* Current Year */}
+  <div>
+    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+      Current Academic Year
+    </label>
+
+    <select
+      value={factualData.currentYear ?? 1}
+      onChange={(e) => {
+        const year = Number(e.target.value) as 1 | 2 | 3 | 4;
+
+        const maxSemesters = year * 2;
+
+        const existingCgpas = factualData.semesterCgpas ?? [];
+
+        const updatedCgpas = existingCgpas.slice(0, maxSemesters);
+
+        const validCgpas = updatedCgpas.filter(
+          (cgpa) => cgpa > 0
+        );
+
+        const overallCgpa =
+          validCgpas.length > 0
+            ? Number(
+                (
+                  validCgpas.reduce(
+                    (sum, cgpa) => sum + cgpa,
+                    0
+                  ) / validCgpas.length
+                ).toFixed(2)
+              )
+            : 0;
+
+        onUpdateFactualData({
+          ...factualData,
+          currentYear: year,
+          semesterCgpas: updatedCgpas,
+          cgpa: overallCgpa,
+        });
+      }}
+      className="w-full px-3 py-2 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-blue-500"
+    >
+      <option value={1}>1st Year</option>
+      <option value={2}>2nd Year</option>
+      <option value={3}>3rd Year</option>
+      <option value={4}>4th Year</option>
+    </select>
+
+    <p className="text-[10px] text-slate-400 mt-1">
+      Select your current year of engineering.
+    </p>
+  </div>
+
+  {/* Semester CGPA */}
+  <div>
+    <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-2">
+      Semester-wise CGPA
+    </label>
+
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+
+      {Array.from(
+        {
+          length: (factualData.currentYear ?? 1) * 2,
+        },
+        (_, index) => {
+
+          const semester = index + 1;
+
+          const semesterCgpas =
+            factualData.semesterCgpas ?? [];
+
+          const value =
+            semesterCgpas[index] ?? 0;
+
+          return (
+            <div key={semester}>
+
+              <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                Semester {semester}
+              </label>
+
+              <input
+                type="number"
+                min="0"
+                max="10"
+                step="0.01"
+                placeholder="0.00"
+                value={value === 0 ? '' : value}
+                onChange={(e) => {
+
+                  const inputValue =
+                    e.target.value;
+
+                  const newValue =
+                    inputValue === ''
+                      ? 0
+                      : Math.min(
+                          10,
+                          Math.max(
+                            0,
+                            parseFloat(inputValue) || 0
+                          )
+                        );
+
+                  const updatedCgpas = [
+                    ...(factualData.semesterCgpas ?? []),
+                  ];
+
+                  updatedCgpas[index] = newValue;
+
+                  const validCgpas =
+                    updatedCgpas.filter(
+                      (cgpa) => cgpa > 0
+                    );
+
+                  const overallCgpa =
+                    validCgpas.length > 0
+                      ? Number(
+                          (
+                            validCgpas.reduce(
+                              (sum, cgpa) =>
+                                sum + cgpa,
+                              0
+                            ) /
+                            validCgpas.length
+                          ).toFixed(2)
+                        )
+                      : 0;
+
+                  onUpdateFactualData({
+                    ...factualData,
+                    semesterCgpas:
+                      updatedCgpas,
+                    cgpa: overallCgpa,
+                  });
+                }}
+                className="w-full px-2 py-1.5 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-1 focus:ring-blue-500 font-mono"
+              />
+
+            </div>
+          );
+        }
+      )}
+
+    </div>
+  </div>
+
+  {/* Overall CGPA */}
+  <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50">
+
+    <div className="flex items-center justify-between">
+
+      <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+        Overall CGPA
+      </span>
+
+      <span className="text-base font-extrabold text-blue-600 dark:text-blue-400 font-mono">
+        {Number(factualData.cgpa || 0).toFixed(2)} / 10
+      </span>
+
+    </div>
+
+    <p className="text-[10px] text-slate-400 mt-1">
+      Automatically calculated from the semesters entered.
+    </p>
+
+  </div>
+
+</div>
               <div>
                 <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Coursework & Internal Assignments (%)
