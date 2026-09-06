@@ -7,7 +7,7 @@ export type CareerRoleId =
 
 export interface CareerSkillRequirement {
   name: string;
-  required: number; // 0-100 scale
+  required: number;
   category: 'core' | 'framework' | 'tools' | 'soft';
   description: string;
 }
@@ -22,12 +22,12 @@ export interface CareerRole {
 }
 
 export interface StudentScores {
-  academic: number;       // Suggested weight: 25%
-  technical: number;      // Suggested weight: 25%
-  aptitude: number;       // Suggested weight: 15%
-  communication: number;  // Suggested weight: 15%
-  projects: number;       // Suggested weight: 10%
-  exposure: number;       // Suggested weight: 10%
+  academic: number;
+  technical: number;
+  aptitude: number;
+  communication: number;
+  projects: number;
+  exposure: number;
 }
 
 export interface ScoringWeights {
@@ -39,16 +39,27 @@ export interface ScoringWeights {
   exposure: number;
 }
 
-export type SkillProficiency = 'None' | 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+export type SkillProficiency =
+  | 'None'
+  | 'Beginner'
+  | 'Intermediate'
+  | 'Advanced'
+  | 'Expert';
 
 export interface UploadedCertificate {
   id: string;
   name: string;
   issuer: string;
   issueDate: string;
-  category: 'technical' | 'cloud' | 'soft_skills' | 'academic' | 'internship' | 'other';
+  category:
+    | 'technical'
+    | 'cloud'
+    | 'soft_skills'
+    | 'academic'
+    | 'internship'
+    | 'other';
   credentialId?: string;
-  fileDataUrl?: string; // base64 data url for preview or download
+  fileDataUrl?: string;
   fileName?: string;
   fileSize?: number;
   uploadedAt: string;
@@ -56,42 +67,71 @@ export interface UploadedCertificate {
 
 export interface StudentFactualData {
   // Academic Performance & Coursework Evidence
-  cgpa: number; // e.g. 8.5 (scale 0-10)
-  assignmentsScore: number; // e.g. 88 (scale 0-100) coursework assignments & test average
+
+  // Overall CGPA used by the existing scoring engine
+  cgpa: number;
+
+  // NEW: Current academic year
+  // 1 = First Year
+  // 2 = Second Year
+  // 3 = Third Year
+  // 4 = Fourth Year
+  currentYear?: 1 | 2 | 3 | 4;
+
+  // NEW: Semester-wise CGPA
+  // Index 0 = Semester 1
+  // Index 1 = Semester 2
+  // ...
+  // Index 7 = Semester 8
+  semesterCgpas?: number[];
+
+  assignmentsScore: number;
   hasBacklogs: boolean;
   backlogCount: number;
 
   // Technical & Coding Skills Evidence
-  codingAssessmentScore: number; // e.g. 86 (scale 0-100) proctored coding test & assessment
-  primaryLanguage: string; // e.g. "Java"
-  primaryLanguageLevel: SkillProficiency; // e.g. "Advanced"
-  secondaryLanguage: string; // e.g. "Python"
-  secondaryLanguageLevel: SkillProficiency; // e.g. "Intermediate"
-  dsaLevel: SkillProficiency; // e.g. "Intermediate"
-  sqlLevel: SkillProficiency; // e.g. "Intermediate"
-  dsaProblemsSolved: number; // e.g. 140 (verified platform problem count)
-  githubCommitsThisYear: number; // e.g. 145 (verified commit history)
+  codingAssessmentScore: number;
+  primaryLanguage: string;
+  primaryLanguageLevel: SkillProficiency;
+  secondaryLanguage: string;
+  secondaryLanguageLevel: SkillProficiency;
+  dsaLevel: SkillProficiency;
+  sqlLevel: SkillProficiency;
+  dsaProblemsSolved: number;
+  githubCommitsThisYear: number;
 
   // Projects & Practical Work Evidence
-  projectCount: number; // e.g. 3
-  hasFullStackOrDeployed: boolean; // e.g. true (verified cloud deployment / live URL)
-  hasGitRepo: boolean; // e.g. true (active public repository & version control)
+  projectCount: number;
+  hasFullStackOrDeployed: boolean;
+  hasGitRepo: boolean;
 
   // Certifications & Industry Exposure Evidence
-  certificationsCount: number; // e.g. 4
-  hasInternship: boolean; // e.g. true (verified industry internship)
-  internshipRole?: string; // e.g. "Java Backend Engineering Intern"
-  internshipMonths: number; // e.g. 3
+  certificationsCount: number;
+  hasInternship: boolean;
+  internshipRole?: string;
+  internshipMonths: number;
 
   // Aptitude & Analytical Reasoning Evidence
-  aptitudeMockPercentile: number; // e.g. 78 (standardized test result)
-  aptitudePracticeLevel: 'Beginner' | 'Intermediate' | 'Advanced';
+  aptitudeMockPercentile: number;
+  aptitudePracticeLevel:
+    | 'Beginner'
+    | 'Intermediate'
+    | 'Advanced';
 
   // Communication & Viva / Interview Evidence
-  communicationRating: 'Needs Practice' | 'Average' | 'Good' | 'Excellent';
-  vivaInterviewScore?: number; // e.g. 85 (technical viva & mock interview performance)
-  gdParticipation: boolean; // group discussion & technical seminar participation
-  englishProficiency: 'Basic' | 'Conversational' | 'Professional' | 'Fluent';
+  communicationRating:
+    | 'Needs Practice'
+    | 'Average'
+    | 'Good'
+    | 'Excellent';
+
+  vivaInterviewScore?: number;
+  gdParticipation: boolean;
+  englishProficiency:
+    | 'Basic'
+    | 'Conversational'
+    | 'Professional'
+    | 'Fluent';
 }
 
 export interface StudentProfile {
@@ -108,8 +148,12 @@ export interface StudentProfile {
   certifications: string[];
   uploadedCertificates: UploadedCertificate[];
   factualData: StudentFactualData;
-  projects: Array<{ title: string; tech: string; description: string }>;
-  customSkillLevels: Record<string, number>; // e.g. "Java": 85, "OOP": 80, "DSA": 55, "SQL": 60, "Git": 75, "Spring Boot": 35
+  projects: Array<{
+    title: string;
+    tech: string;
+    description: string;
+  }>;
+  customSkillLevels: Record<string, number>;
 }
 
 export type ReadinessCategory =
@@ -144,7 +188,7 @@ export interface SkillGapItem {
   skillName: string;
   required: number;
   current: number;
-  gap: number; // required - current
+  gap: number;
   status: 'Good' | 'Needs Improvement' | 'High Priority';
   category: string;
   description: string;
